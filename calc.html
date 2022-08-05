@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>统分</title>
+</head>
+
+<body>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script>
+        //new Array
+        var personArray=new Map();
+
+       
+        
+        function isBlank(item) {
+            var result= (item.trim()!=="" && item.trim()!=="\n" && item.trim()!=="\r\n" && item.trim()!=="\r");
+            return result ;
+        }
+        $(function () {
+            $("#calc").click(function () {
+                //split line and filter blank line 
+                
+                var scoresArray = $("#scores").val().split("\n").filter(isBlank).map(Number);
+                var sum = 0.0;
+                var min = Math.min(...scoresArray);  // lowest in array by spreading
+                var max = Math.max(...scoresArray);  // highest in array by spreading
+                var wubuScoresArray = $("#wubuScores").val().split("\n").filter(isBlank).map(Number);
+                var zhSum = 0.0;
+                var wbSum = 0.0;
+                for (var i = 0; i < scoresArray.length; i++) {
+                    (zhSum += (scoresArray[i]));
+                }
+                for (var i = 0; i < wubuScoresArray.length; i++) {
+                    (wbSum += (wubuScoresArray[i]));
+                }
+            
+
+                
+                var zhAvg = (zhSum - max - min) / (scoresArray.length - 2);
+                zhAvg=Math.round(zhAvg * 1000) / 1000
+
+                var wbAvg=0;
+                var avg=0;
+                if(wubuScoresArray.length<=0){
+                    avg=zhAvg;
+                }else{
+                    wbAvg = wbSum / wubuScoresArray.length ;
+                    wbAvg=Math.round(wbAvg * 1000) / 1000;
+                    avg= (zhAvg*0.8+wbAvg*0.2);
+                }
+                avg=Math.round(avg * 1000) / 1000;
+                var fixArray = $("#fix").val().split("\n").filter(isBlank).map(Number);
+                var avgFix = avg;
+                for (var i = 0; i < fixArray.length; i++) {
+                    (avgFix += fixArray[i]);
+                }
+                var sumWithoutMaxMin = sum - max - min;
+                var userName = $("#userName").val();
+
+                var person = {
+                    userName: userName,
+                    sum: sum,
+                    max: max,
+                    min: min,
+                    sumWithoutMaxMin: sumWithoutMaxMin,
+                    avg: avg,
+                    avgFix: avgFix,
+                    zhAvg: zhAvg,
+                    wbAvg: wbAvg,
+                    srcScores: scoresArray,
+                    srcFix: fixArray
+                };
+                //set result label 
+                $("#result").text(
+                    "姓名:" + person.userName + "\r\n" +
+                    "最高分: " + person.max + "\r\n" +
+                    "最低分: " + person.min + "\r\n" +
+                    "综合平均分: " + person.zhAvg + "\r\n" +
+                    "舞步平均分: " + person.wbAvg + "\r\n" +
+                    "平均分: " + person.avg + "\r\n" +
+                    "最后得分: " + person.avgFix
+                );
+                //add person to array
+                personArray.set(person.userName,person);
+                // order by sumWithoutMaxMin
+                personArray=new Map([...personArray.entries()].sort((a, b) => b[1].avgFix - a[1].avgFix))
+
+                //clear log label
+                $("#log").text("");
+                //foreach personArry to log label
+                var i =1;
+                personArray.forEach(function (person, index) {
+                    $("#log").append("\r\n" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分");
+                    i++;
+                });
+                localStorage.myMap = JSON.stringify(Array.from(personArray.entries()));
+            });
+            if(localStorage.myMap!=null){
+                personArray = new Map(JSON.parse(localStorage.myMap));
+                var i =1;
+                    personArray.forEach(function (person, index) {
+                        $("#log").append("\r\n" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分");
+                        i++;
+                    });
+            }
+        });
+        function clearStore(){
+            localStorage.clear();   
+            $("#log").text("");
+        }
+    </script>
+
+    名称: <input id="userName" />
+    <br>
+    <br>
+    综合裁判分:<br>
+    <textarea rows="10" id='scores'>
+</textarea>
+    <br>
+    <br>
+    舞步裁判分:<br>
+    <textarea rows="10" id='wubuScores'>
+</textarea>
+    <br>
+    <br>
+    裁判长分:<br>
+    <textarea rows="5" id="fix"></textarea>
+    <br>
+    <input type="button" id="calc" value="计算" />  
+
+    <br>
+    <br>
+    结果:
+    <br>
+    <textarea rows="10" id="result">
+</textarea>
+</body>
+<br>
+<br>
+排名:
+<br>
+<textarea rows="10" id="log">
+</textarea>
+<input type="button" id="clear" value="清空" onclick="clearStore()" />
+</body>
+
+</html>
