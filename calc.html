@@ -20,7 +20,9 @@
 
         function sortToLog(personArray) {
             personArray=new Map([...personArray.entries()].sort((a, b) => b[1].avgFix - a[1].avgFix))
-
+            //clear log label
+            $("#logArea").text("");
+            $("#log").html("");
             var i = 1;
             personArray.forEach(function (person, index) {
                 $("#log").append("<option value='" + person.userName + "'>" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分" + "</option>");
@@ -116,8 +118,7 @@
                 //add person to array
                 personArray.set(person.userName,person);
 
-                //clear log label
-                $("#log").text("");
+
                 //foreach personArry to log label
                 sortToLog(personArray);
                 localStorage.myMap = JSON.stringify(Array.from(personArray.entries()));
@@ -131,7 +132,8 @@
 
         function clearStore(){
             localStorage.clear();   
-            $("#log").text("");
+            //refresh page
+            location.reload();
         }
     </script>
 
