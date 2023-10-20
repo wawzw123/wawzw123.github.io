@@ -13,13 +13,40 @@
         //new Array
         var personArray=new Map();
 
-       
-        
         function isBlank(item) {
             var result= (item.trim()!=="" && item.trim()!=="\n" && item.trim()!=="\r\n" && item.trim()!=="\r");
             return result ;
         }
+
+        function sortToLog(personArray) {
+            var i = 1;
+            personArray.forEach(function (person, index) {
+                $("#log").append("<option value='" + person.userName + "'>" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分" + "</option>");
+                i++;
+            });
+        }
+
         $(function () {
+            $("#log").change(function () {
+                alert("select");
+                var userName = $("#log").val();
+                var person = personArray.get(userName);
+                $("#result").text(
+                    "姓名:" + person.userName + "\r\n" +
+                    "最高分: " + person.max + "\r\n" +
+                    "最低分: " + person.min + "\r\n" +
+                    "综合平均分: " + person.zhAvg + "\r\n" +
+                    "舞步平均分: " + person.wbAvg + "\r\n" +
+                    "平均分: " + person.avg + "\r\n" +
+                    "最后得分: " + person.avgFix
+                );
+                //set scores wubuScores fix userName
+                $("#scores").val(person.srcScores.join("\n"));
+                $("#wubuScores").val(person.srcWubuScores.join("\n"));
+                $("#fix").val(person.srcFix.join("\n"));
+                $("#userName").val(person.userName);
+
+            });
             $("#calc").click(function () {
                 //split line and filter blank line 
                 
@@ -71,6 +98,7 @@
                     zhAvg: zhAvg,
                     wbAvg: wbAvg,
                     srcScores: scoresArray,
+                    srcWubuScores: wubuScoresArray,
                     srcFix: fixArray
                 };
                 //set result label 
@@ -91,22 +119,16 @@
                 //clear log label
                 $("#log").text("");
                 //foreach personArry to log label
-                var i =1;
-                personArray.forEach(function (person, index) {
-                    $("#log").append("\r\n" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分");
-                    i++;
-                });
+                sortToLog(personArray);
                 localStorage.myMap = JSON.stringify(Array.from(personArray.entries()));
             });
             if(localStorage.myMap!=null){
                 personArray = new Map(JSON.parse(localStorage.myMap));
-                var i =1;
-                    personArray.forEach(function (person, index) {
-                        $("#log").append("\r\n" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分");
-                        i++;
-                    });
+                sortToLog(personArray);
             }
         });
+        //select option selected event
+
         function clearStore(){
             localStorage.clear();   
             $("#log").text("");
@@ -142,8 +164,8 @@
 <br>
 排名:
 <br>
-<textarea rows="10" id="log">
-</textarea>
+<select id="log" size="10">
+</select>
 <input type="button" id="clear" value="清空" onclick="clearStore()" />
 </body>
 
