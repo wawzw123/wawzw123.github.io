@@ -19,9 +19,12 @@
         }
 
         function sortToLog(personArray) {
+            personArray=new Map([...personArray.entries()].sort((a, b) => b[1].avgFix - a[1].avgFix))
+
             var i = 1;
             personArray.forEach(function (person, index) {
                 $("#log").append("<option value='" + person.userName + "'>" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分" + "</option>");
+                $("#logArea").append("\r\n" + "第" + (i) + "名:" + person.userName + " " + person.avgFix + "分");
                 i++;
             });
         }
@@ -112,8 +115,6 @@
                 );
                 //add person to array
                 personArray.set(person.userName,person);
-                // order by sumWithoutMaxMin
-                personArray=new Map([...personArray.entries()].sort((a, b) => b[1].avgFix - a[1].avgFix))
 
                 //clear log label
                 $("#log").text("");
@@ -163,6 +164,8 @@
 <br>
 排名:
 <br>
+<textarea rows="10" id="logArea">
+</textarea>
 <select id="log" size="10">
 </select>
 <input type="button" id="clear" value="清空" onclick="clearStore()" />
